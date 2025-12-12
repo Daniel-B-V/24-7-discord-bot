@@ -1,4 +1,3 @@
-process.env.FFMPEG_PATH = 'C:\\ffmpeg\\bin\\ffmpeg.exe';
 require('dotenv').config();
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const { Player } = require('discord-player');
@@ -100,10 +99,12 @@ client.once('ready', async () => {
             console.log(`[24/7] Successfully joined: ${voiceChannel.name}`);
         } catch (error) {
             console.error('[24/7 ERROR] Failed to join:', error);
+            console.error('Full error:', error);
         }
 
     } catch (error) {
         console.error('[ERROR] Failed to setup 24/7:', error);
+        console.error('Full error:', error);
     }
 });
 
@@ -148,6 +149,7 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
                 
             } catch (error) {
                 console.error('[ERROR] Failed to rejoin:', error);
+                console.error('Full error:', error);
             }
         }, 2000);
     }
@@ -178,7 +180,7 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
-// Player events - ADD THESE FOR BETTER DEBUGGING
+// Player events
 player.events.on('debug', async (queue, message) => {
     console.log(`[PLAYER DEBUG] ${message}`);
 });
@@ -206,11 +208,24 @@ player.events.on('connection', (queue) => {
 
 player.events.on('connectionError', (queue, error) => {
     console.error(`[PLAYER CONNECTION ERROR] ${error.message}`);
+    console.error(error);
 });
 
 player.events.on('emptyQueue', (queue) => {
     console.log('[PLAYER] Queue is empty');
 });
 
+// Error handling for uncaught exceptions
+process.on('uncaughtException', (error) => {
+    console.error('[UNCAUGHT EXCEPTION]', error);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('[UNHANDLED REJECTION]', reason);
+});
+
 // Login
-client.login(process.env.BOT_TOKEN);
+client.login(process.env.BOT_TOKEN).catch(error => {
+    console.error('[LOGIN ERROR] Failed to login:', error);
+    process.exit(1);
+});

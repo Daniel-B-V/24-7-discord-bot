@@ -1,0 +1,11 @@
+[phases.setup]
+cmds = ["apt-get update && apt-get install -y python3 build-essential"]
+
+[phases.install]
+cmds = ["npm ci --omit=dev"]
+
+[phases.build]
+cmds = ["echo 'Build complete'"]
+
+[start]
+cmd = "node index.js"
